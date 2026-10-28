@@ -1,0 +1,1025 @@
+@import "tailwindcss";
+
+/* Lenis (smooth scroll) container rules */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ───────────────────────────────────────────────────────────
+   Colours, from the Bio Growth packaging. The green of the "+"
+   and the farmer's shirt — the one colour on every pack — carries
+   the bands, taken darker for a field-and-soil ground. Wheat gold
+   is the highlight. Pack colours (crimson, orange, azure, indigo)
+   stay on the products themselves.
+
+   --field  full-bleed colour bands: leaf green
+   --deep   the dark ground of the hero and footer: forest
+   --soil-deep  the heritage band (journey): tilled soil
+   --hi     the bright partner to --deep (hero headline, numerals)
+   --num    numerals set on --field
+
+   Token definitions stay outside @layer on purpose: custom
+   properties should win over everything.
+   ─────────────────────────────────────────────────────────── */
+
+:root {
+  --field: #2b6410;
+  --field-ink: #f2f6e8;
+  --num: #f4d28f;
+  --deep: #0e2010;
+  --deep-ink: #edf1e4;
+  --soil-deep: #2a1b10;
+  --soil-deep-ink: #f5ecdf;
+  --hi: #f4d28f;
+  --crimson: #ba0c2f;
+  --page: #f4f4f1;
+  --page-ink: #141414;
+  --muted: #5d5d58;
+  --mint: #e6f0de;
+  --line: rgba(20, 20, 20, 0.12);
+
+  --green: #5aa912;
+  --green-light: #8dc63f;
+  --green-deep: #2f6b0a;
+  --green-ink: #0c1904;
+  --soil: #6b4423;
+  --soil-light: #a67447;
+
+  /* the bar floats inside a gap, so the header's footprint is both */
+  --gap: 8px;
+  --bar-h: 58px;
+  --header-h: calc(var(--bar-h) + 2 * var(--gap));
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gap: 10px;
+    --bar-h: 64px;
+  }
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-ink: var(--page-ink);
+  --color-field: var(--field);
+  --color-deep: var(--deep);
+  --color-hi: var(--hi);
+  --color-green: var(--green);
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-instrument);
+}
+
+@layer base {
+  html {
+    /* Lenis owns scrolling; native smooth would fight it */
+    scroll-behavior: auto;
+    scroll-padding-top: var(--header-h);
+  }
+
+  body {
+    background: var(--page);
+    color: var(--page-ink);
+    font-family: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--green);
+    color: var(--green-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+  }
+}
+
+/* Everything below is in @layer components so Tailwind utilities
+   (hidden, lg:block, spacing overrides) still win. */
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: 1380px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 56px);
+  }
+
+  /* Poster type — Anton, always capitals, set tight. */
+  .display {
+    font-family: var(--font-anton), Impact, "Arial Narrow", sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: 0.005em;
+  }
+  .display-lg {
+    font-size: clamp(2.9rem, 6.4vw, 6.4rem);
+  }
+  .display-md {
+    font-size: clamp(2.2rem, 4.2vw, 4rem);
+  }
+
+  .deva {
+    font-family: var(--font-hind), "Noto Sans Devanagari", sans-serif;
+    font-weight: 600;
+  }
+
+  /* Grain over the whole page, as on the reference. Fixed, so it
+     costs one layer rather than one per section. */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.4 -0.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* ─── Colour bands ───────────────────────────────────── */
+
+  .band-field {
+    background: var(--field);
+    color: var(--field-ink);
+  }
+  .band-deep {
+    background: var(--deep);
+    color: var(--deep-ink);
+  }
+  .band-soil {
+    background: var(--soil-deep);
+    color: var(--soil-deep-ink);
+  }
+  .band-mint {
+    background: var(--mint);
+    color: var(--page-ink);
+  }
+  /* Wavy section edges. The SVG sits on the bottom of a section and
+     is filled with the colour of the section that follows. */
+  .wave {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: clamp(56px, 8vw, 132px);
+    pointer-events: none;
+  }
+  .wave-top {
+    top: -1px;
+    bottom: auto;
+    z-index: 1;
+  }
+
+  /* Photographs. Square-cornered, with a hairline frame set off
+     behind them like a mounted print. */
+  .photo {
+    position: relative;
+    isolation: isolate;
+  }
+  .photo::before {
+    content: "";
+    position: absolute;
+    inset: 16px -16px -16px 16px;
+    border: 1.5px solid currentColor;
+    opacity: 0.35;
+    z-index: -1;
+  }
+  .photo > img {
+    object-fit: cover;
+  }
+  /* a forest wash over a full-bleed photo, so type can sit on it */
+  .photo-shade {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--deep) 74%, transparent);
+  }
+
+  /* ─── Header ─────────────────────────────────────────── */
+  /* Valmont's bar: black, floating inside a gap, rounded. Scrolling
+     down tucks it away; scrolling back up by half its height brings it
+     back. Products grows a panel out of the bar itself, so the bar and
+     the panel read as one black slab. */
+
+  .masthead {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    padding: var(--gap);
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  /* keyboard focus inside keeps it out; a tap leaves focus on the
+     link, so plain :focus-within would pin it for good */
+  .masthead[data-hidden]:not(:has(:focus-visible)) {
+    transform: translateY(-110%);
+  }
+  .mast-box {
+    pointer-events: auto;
+    background: #0a0a0a;
+    color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+  }
+  .masthead[data-scrolled] .mast-box,
+  .mast-box[data-mega] {
+    box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.7);
+  }
+  .navbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: var(--bar-h);
+    padding-inline: clamp(12px, 1.6vw, 22px) clamp(6px, 0.8vw, 8px);
+  }
+  .logo-link {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+  .logo-link:hover {
+    transform: scale(1.05);
+  }
+
+  .navlink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 15.5px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+  }
+  /* Valmont dims the siblings of whatever you are pointing at */
+  .nav-links:hover .navlink:not(:hover) {
+    opacity: 0.55;
+  }
+  .navlink svg {
+    transition: transform 0.3s ease;
+  }
+  .navlink[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1 !important;
+  }
+  .navlink[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+  .navlink .dot {
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    border-radius: 99px;
+    background: var(--green-light);
+    display: none;
+  }
+  .navlink[aria-current="true"] {
+    color: #fff;
+    font-weight: 600;
+  }
+  .navlink[aria-current="true"] .dot {
+    display: block;
+  }
+
+  .nav-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .nav-phone span:first-child {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--green-light);
+  }
+
+  .nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 5px 0 22px;
+    border-radius: 9px;
+    background: var(--field);
+    color: #fff;
+    font-size: 15.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  .nav-cta > span {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--field);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .nav-cta:hover {
+    background: color-mix(in srgb, var(--field) 82%, #fff);
+  }
+  .nav-cta:hover > span {
+    transform: rotate(45deg);
+  }
+
+  .nav-burger {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  /* The product panel. Rows animate 0fr → 1fr so the slab grows down
+     from the bar; the contents follow a beat later. */
+  .mega {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .mast-box[data-mega] .mega {
+    grid-template-rows: 1fr;
+  }
+  .mega > div {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .mega-body {
+    display: grid;
+    grid-template-columns: 1fr 1.75fr 0.95fr 0.95fr;
+    gap: clamp(28px, 3vw, 52px);
+    margin-inline: clamp(12px, 1.6vw, 22px);
+    padding: 34px 0 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.25s ease, transform 0.35s ease;
+  }
+  .mast-box[data-mega] .mega-body {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.14s;
+  }
+  .mega-label {
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.42);
+  }
+  .mega-links:hover a:not(:hover) {
+    opacity: 0.55;
+  }
+  .mega-pack {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  .mega-pack .swatch {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    margin-top: 5px;
+    border-radius: 4px;
+    transition: transform 0.3s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .mega-pack:hover .swatch,
+  .mega-pack:focus-visible .swatch {
+    transform: scale(1.35) rotate(45deg);
+  }
+  .mega-cat {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 11px 0;
+    font-size: 17px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  .mega-feature {
+    position: relative;
+    display: block;
+    min-height: 210px;
+    padding: 18px;
+    border-radius: 10px;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.35s ease;
+  }
+  .mega-feature img {
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .mega-feature:hover img {
+    transform: translateY(-6px) rotate(2deg);
+  }
+
+  /* Valmont's text link: an underline that pulls away and a dot that
+     drops in as the label slides over. */
+  .dot-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    font-size: 16px;
+    line-height: 1.4;
+    color: currentColor;
+    text-decoration: none;
+  }
+  .dot-link .dot {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green-light);
+    opacity: 0;
+    transform: translateY(-50%) scale(0);
+    transition: 0.3s ease;
+  }
+  .dot-link .label {
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+  .dot-link .underline {
+    position: absolute;
+    left: 0;
+    bottom: -0.1em;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform-origin: right center;
+    transition: transform 0.3s ease;
+  }
+  .dot-link:hover .dot,
+  .dot-link:focus-visible .dot {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+  .dot-link:hover .label,
+  .dot-link:focus-visible .label {
+    transform: translateX(16px);
+  }
+  .dot-link:hover .underline,
+  .dot-link:focus-visible .underline {
+    transform: scaleX(0);
+  }
+
+  .mobile-menu {
+    max-height: calc(100svh - var(--header-h) - var(--gap));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin-inline: clamp(12px, 1.6vw, 22px);
+    padding-block: 4px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .mobile-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 12px;
+    text-align: left;
+  }
+
+  /* ─── Buttons ────────────────────────────────────────── */
+  /* The reference's button: a flat slab with the arrow in its own
+     darker square on the right. */
+
+  .btn {
+    --btn-bg: var(--field);
+    --btn-ink: var(--field-ink);
+    display: inline-flex;
+    align-items: stretch;
+    height: 56px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--btn-bg) 60%, #fff);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .btn > span:first-child {
+    display: flex;
+    align-items: center;
+    padding: 0 26px 0 24px;
+    white-space: nowrap;
+  }
+  .btn > span:last-child {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    background: rgba(0, 0, 0, 0.14);
+  }
+  .btn svg {
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .btn:hover {
+    transform: translateY(-3px);
+  }
+  .btn:hover svg {
+    transform: translateX(4px);
+  }
+  .btn-white {
+    --btn-bg: #fff;
+    --btn-ink: #141414;
+  }
+  /* for green and soil bands, where a green button would vanish */
+  .btn-gold {
+    --btn-bg: var(--hi);
+    --btn-ink: var(--soil-deep);
+  }
+  .btn-white > span:last-child {
+    background: var(--field);
+    color: var(--field-ink);
+  }
+  .btn-sm {
+    height: 46px;
+    font-size: 13px;
+  }
+  .btn-sm > span:first-child {
+    padding: 0 16px;
+  }
+  .btn-sm > span:last-child {
+    width: 46px;
+  }
+
+  /* ─── Hero ───────────────────────────────────────────── */
+
+  /* Field plots: an 80px grid with a few cells lit, the way the
+     reference lights squares behind its can. */
+  .plots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.07) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .plot-lit {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: color-mix(in srgb, var(--field) 30%, transparent);
+  }
+
+  .hero-type {
+    font-size: clamp(5.4rem, 21.5vw, 19rem);
+    line-height: 0.84;
+    letter-spacing: 0;
+  }
+  .hero-type > span {
+    display: block;
+  }
+
+  /* ─── Floating bits (granules, leaves, the plus) ─────── */
+
+  .bit {
+    position: absolute;
+    pointer-events: none;
+    transform: translate3d(0, var(--py, 0px), 0);
+    will-change: transform;
+  }
+  .bit > * {
+    display: block;
+    animation: bob var(--bob, 6s) ease-in-out var(--bob-delay, 0s) infinite
+      alternate;
+  }
+  .bit svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ─── Product cards ──────────────────────────────────── */
+
+  .pack-card {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    clip-path: url(#scallop);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .pack-card:hover {
+    transform: translateY(-6px);
+  }
+  .pack-card .pack-img {
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .pack-card:hover .pack-img {
+    transform: rotate(0deg) scale(1.05);
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    height: 54px;
+    padding: 0 18px;
+    border-radius: 16px;
+    background: #fff;
+  }
+
+  /* ─── Sticker pills (portfolio) ──────────────────────── */
+
+  .sticker {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 16px 30px 18px;
+    border-radius: 999px;
+    transition: transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .sticker:hover {
+    transform: rotate(0deg) scale(1.06) !important;
+  }
+
+  /* ─── How it works (pinned scene) ───────────────────── */
+  /* The section is tall; the stage inside it sticks for the whole run
+     and the scroll position scrubs the drawing. */
+
+  .grow {
+    position: relative;
+    height: 440vh;
+    padding-bottom: clamp(56px, 8vw, 132px);
+    background: var(--soil-deep);
+    color: #fff;
+  }
+  .grow-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    background: var(--deep);
+  }
+  .grow-copy {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    padding-top: calc(var(--gap) + 18px);
+    pointer-events: none;
+  }
+  .grow-panel {
+    width: 100%;
+    max-width: 520px;
+  }
+  @media (min-width: 1024px) {
+    .grow-copy {
+      align-items: center;
+      padding-top: 0;
+    }
+  }
+  .grow-eyebrow {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--hi);
+  }
+  .grow-count::before {
+    content: "01";
+  }
+  [data-step="1"] .grow-count::before {
+    content: "02";
+  }
+  [data-step="2"] .grow-count::before {
+    content: "03";
+  }
+  [data-step="3"] .grow-count::before,
+  [data-step="all"] .grow-count::before {
+    content: "04";
+  }
+  /* all four captions share one cell and cross-fade */
+  .grow-steps {
+    display: grid;
+  }
+  .grow-step {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  [data-step="0"] .grow-step[data-i="0"],
+  [data-step="1"] .grow-step[data-i="1"],
+  [data-step="2"] .grow-step[data-i="2"],
+  [data-step="3"] .grow-step[data-i="3"] {
+    opacity: 1;
+    transform: none;
+  }
+  .grow-title {
+    font-size: clamp(2.6rem, 5.4vw, 5.6rem);
+    color: #fff;
+  }
+  .grow-bar {
+    margin-top: 28px;
+    height: 3px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.16);
+    overflow: hidden;
+  }
+  .grow-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--green-light);
+    transform-origin: left;
+    transform: scaleX(var(--p));
+  }
+  /* small screens: the copy sits over the sky, so keep it short */
+  @media (max-width: 1023px) {
+    .grow-title {
+      font-size: clamp(2.2rem, 9vw, 3.4rem);
+    }
+    .grow-step p + p {
+      margin-top: 8px;
+      font-size: 15.5px;
+    }
+    .grow-bar {
+      margin-top: 16px;
+    }
+  }
+  .grow-swell {
+    animation: swell 5s linear infinite;
+  }
+  .grow-caustics {
+    animation: swell 9s linear infinite reverse;
+  }
+  .grow-sway {
+    animation: sway 4.5s ease-in-out infinite alternate;
+  }
+
+  /* ─── Marquee ────────────────────────────────────────── */
+
+  .marquee {
+    display: flex;
+    width: max-content;
+    animation: drift 42s linear infinite;
+  }
+
+  /* ─── Entrance system ───────────────────────────────── */
+  /* Keyframes and timings lifted from the reference build: a short
+     rise with a skew/rotate flick, overshooting 4px at the midpoint
+     before settling. An observer adds .inview to each block. */
+
+  .word {
+    display: inline-block;
+    transform-origin: left bottom;
+    will-change: transform, opacity;
+  }
+
+  .animated-text .word,
+  .animated-block.rise.inview > *,
+  .animated-block.stagger.inview .stagger-item,
+  .animated-block.media.inview img,
+  .animated-block.soft.inview > * {
+    opacity: 0;
+  }
+
+  .animated-text.inview .word.bounce {
+    animation: 0.75s ease 0s 1 normal forwards running bounceUp;
+  }
+  .animated-text.inview .word.fade {
+    animation: 0.6s ease 0s 1 normal forwards running bounceUp2;
+  }
+
+  .animated-block.rise.inview > *,
+  .animated-block.stagger.inview .stagger-item {
+    transform-origin: left bottom;
+    animation: 0.75s ease 0s 1 normal forwards running bounceUp;
+  }
+
+  .animated-block.media.inview img {
+    animation: 0.75s ease 0s 1 normal forwards running bounceUp3;
+  }
+
+  .animated-block.soft.inview > * {
+    animation: 0.75s ease 0s 1 normal forwards running fadeUp;
+  }
+
+  .animated-block.pop.inview {
+    animation: 0.75s cubic-bezier(0, 0, 0.5, 1) 0.15s 1 normal forwards
+      running scaleUp;
+  }
+
+  /* Swapping products re-mounts the pack, which plays this. */
+  .swap-in {
+    animation: swapIn 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
+  }
+}
+
+@keyframes bob {
+  from {
+    transform: translateY(-9px) rotate(-3deg);
+  }
+  to {
+    transform: translateY(9px) rotate(3deg);
+  }
+}
+
+@keyframes swapIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px) rotate(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bounceUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95) skewY(5deg) rotate(3deg);
+  }
+  10% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95) skewY(5deg) rotate(3deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1) skewY(0deg) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1) skewY(0deg) rotate(0deg);
+  }
+}
+
+@keyframes bounceUp2 {
+  10% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95) skewY(7deg) rotate(3deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1) skewY(-1deg) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1) skewY(0deg) rotate(0deg);
+  }
+}
+
+@keyframes bounceUp3 {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  10% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+@keyframes scaleUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes swell {
+  to {
+    transform: translateX(-200px);
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-text .word,
+  .animated-block.rise.inview > *,
+  .animated-block.stagger.inview .stagger-item,
+  .animated-block.media.inview img,
+  .animated-block.soft.inview > *,
+  .animated-block.pop.inview,
+  .swap-in {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+  .marquee,
+  .bit > *,
+  .grow-swell,
+  .grow-caustics,
+  .grow-sway {
+    animation: none !important;
+  }
+  /* no scrubbing: one screen, the finished plant, every caption */
+  .grow {
+    height: auto;
+  }
+  .grow-stage {
+    position: relative;
+    min-height: 100svh;
+  }
+  .grow-step {
+    grid-area: auto;
+    opacity: 1;
+    transform: none;
+    margin-bottom: 20px;
+  }
+  .grow-bar {
+    display: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.001ms !important;
+  }
+}
