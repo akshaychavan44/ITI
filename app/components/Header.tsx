@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { BAG, BRAND, CATALOGUE, NAV, PRODUCTS, inkOf } from "../lib/content";
-import { selectProduct } from "../lib/events";
+import { productHref } from "../lib/catalogue";
 import { ArrowUpRight, Chevron, Menu, Phone } from "./Icons";
 
 /** The nav entry that opens the product menu instead of jumping. */
@@ -15,8 +16,8 @@ const ALIASES: Record<string, string> = { "#spotlight": PRODUCTS_HREF };
 /** Valmont's header: a black bar floating inside a 10px gap. It tucks
  *  away as you scroll down and comes back once you scroll up by half
  *  its height. Products opens a panel that grows out of the bar. */
-export function Header() {
-  const [active, setActive] = useState("");
+export function Header({ interior = false }: { interior?: boolean }) {
+  const [active, setActive] = useState(interior ? PRODUCTS_HREF : "");
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
@@ -52,6 +53,7 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    if (interior) return;
     const sels = [...NAV.map((n) => n.href), ...Object.keys(ALIASES)];
     const targets = sels
       .map((s) => document.querySelector(s))
@@ -80,7 +82,7 @@ export function Header() {
       io.disconnect();
       heroIo.disconnect();
     };
-  }, []);
+  }, [interior]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -107,10 +109,7 @@ export function Header() {
     setOpen(false);
     setSubOpen(false);
   };
-  const pick = (id: string) => {
-    selectProduct(id);
-    closeAll();
-  };
+  const sectionHref = (href: string) => interior ? `/${href}` : href;
 
   const tel = `tel:${BRAND.phone.replace(/\s/g, "")}`;
   const shown = PRODUCTS.find((p) => p.id === feature) ?? PRODUCTS[0];
@@ -128,7 +127,7 @@ export function Header() {
         onMouseLeave={leaveMega}
       >
         <div className="navbar">
-          <a href="#top" className="logo-link" aria-label="Bio Growth+ home" onClick={closeAll}>
+          <a href={interior ? "/" : "#top"} className="logo-link" aria-label="Bio Growth+ home" onClick={closeAll}>
             <Image
               src="/brand/logo-bio-growth-light.png"
               alt="Bio Growth+"
@@ -160,7 +159,7 @@ export function Header() {
               ) : (
                 <a
                   key={n.href}
-                  href={n.href}
+                  href={sectionHref(n.href)}
                   className="navlink"
                   aria-current={active === n.href ? "true" : undefined}
                   onMouseEnter={() => setMega(false)}
@@ -209,13 +208,13 @@ export function Header() {
                   Ninety formulations under Bio Growth+, and the nutrition
                   line beside them — made in Betul for Indian soil.
                 </p>
-                <a href={PRODUCTS_HREF} className="dot-link mt-6" onClick={closeAll}>
+                <Link href="/products" className="dot-link mt-6" onClick={closeAll}>
                   <span className="dot" aria-hidden />
                   <span className="label">
                     See the full range
                     <span className="underline" aria-hidden />
                   </span>
-                </a>
+                </Link>
               </div>
 
               <div>
@@ -224,11 +223,11 @@ export function Header() {
                   {PRODUCTS.map((p) => (
                     <li key={p.id}>
                       <a
-                        href="#spotlight"
+                        href={productHref(p.id)}
                         className="mega-pack"
                         onMouseEnter={() => setFeature(p.id)}
                         onFocus={() => setFeature(p.id)}
-                        onClick={() => pick(p.id)}
+                        onClick={closeAll}
                       >
                         <span className="swatch" style={{ background: p.hex }} aria-hidden />
                         <span>
@@ -248,7 +247,7 @@ export function Header() {
                 <ul className="mega-links">
                   {CATALOGUE.map((c) => (
                     <li key={c.name}>
-                      <a href="#catalogue" className="mega-cat" onClick={closeAll}>
+                      <a href={sectionHref("#catalogue")} className="mega-cat" onClick={closeAll}>
                         <span>{c.name}</span>
                         <span className="text-white/45 tabular-nums">{c.n}</span>
                       </a>
@@ -258,10 +257,10 @@ export function Header() {
               </div>
 
               <a
-                href="#spotlight"
+                href={productHref(shown.id)}
                 className="mega-feature"
                 style={{ background: `color-mix(in srgb, ${inkOf(shown)} 78%, #000)` }}
-                onClick={() => pick(shown.id)}
+                onClick={closeAll}
               >
                 <span className="relative z-[2] block display text-[26px] leading-none">
                   {shown.name}
@@ -306,8 +305,8 @@ export function Header() {
                       {PRODUCTS.map((p) => (
                         <li key={p.id}>
                           <a
-                            href="#spotlight"
-                            onClick={() => pick(p.id)}
+                            href={productHref(p.id)}
+                            onClick={closeAll}
                             className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-white/5"
                           >
                             <span className="w-3 h-3 rounded-[3px] shrink-0" style={{ background: p.hex }} />
@@ -317,15 +316,15 @@ export function Header() {
                         </li>
                       ))}
                       <li>
-                        <a href={PRODUCTS_HREF} onClick={closeAll} className="flex items-center gap-2 py-2.5 px-3 text-white/70">
+                        <Link href="/products" onClick={closeAll} className="flex items-center gap-2 py-2.5 px-3 text-white/70">
                           Full range <ArrowUpRight size={14} />
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   )}
                 </div>
               ) : (
-                <a key={n.href} href={n.href} onClick={closeAll} className="mobile-row border-b border-white/10">
+                <a key={n.href} href={sectionHref(n.href)} onClick={closeAll} className="mobile-row border-b border-white/10">
                   <span className="display text-[32px]">{n.label}</span>
                   {active === n.href && <span className="w-2.5 h-2.5 rounded-full bg-[var(--green-light)]" />}
                 </a>

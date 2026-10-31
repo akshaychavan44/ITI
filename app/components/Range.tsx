@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { BAG, PRODUCTS, inkOf, type Product } from "../lib/content";
 import { Bits } from "./Bits";
+import { Btn } from "./Icons";
 import { Wave } from "./Wave";
 import { Words } from "./Words";
 
@@ -69,9 +70,9 @@ function Card({
 
   return (
     <a
-      href="#spotlight"
+      href={`/products/${p.id}`}
       onClick={() => onSelect(p.id)}
-      aria-label={`${p.name} — show details`}
+      aria-label={`${p.name} — view product`}
       className="stagger-item group block"
       style={{ animationDelay: `${(0.15 + i * 0.07).toFixed(3)}s` }}
     >
@@ -163,7 +164,7 @@ export function Range({
           </h2>
           <p className="mt-6 text-[18px] leading-[1.55] text-[#333] max-w-[48ch] mx-auto">
             Six packs from the Bio Growth+ granular line, each in its own
-            colour. Tap one for the full spec.
+            colour. Explore a product for its full spec.
           </p>
         </div>
 
@@ -171,6 +172,9 @@ export function Range({
           {PRODUCTS.map((p, i) => (
             <Card key={p.id} p={p} i={i} on={p.id === selected} onSelect={onSelect} />
           ))}
+        </div>
+        <div className="mt-12 text-center">
+          <Btn href="/products">View all products</Btn>
         </div>
       </div>
 
