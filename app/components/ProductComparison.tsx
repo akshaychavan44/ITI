@@ -6,7 +6,7 @@ import { CATALOGUE_PRODUCTS, productHref } from "../lib/catalogue";
 import { ArrowUpRight } from "./Icons";
 
 const KEY_DETAILS: Record<string, { composition: string; benefits: string[] }> = {
-  "growth-booster": { composition: "N 1.5–2% · P 0.20–0.50% · K 0.50–0.80%; organic carbon 23%", benefits: ["Supports root growth", "Supports soil microbial activity"] },
+  "growth-booster": { composition: "N 2.65% · P₂O₅ 0.52% · K 0.338%; organic carbon 46.37% · protein 16.54%", benefits: ["Supports root growth", "Supports soil microbial activity"] },
   "bio-guard": { composition: "10 microbial groups · CFU ≥ 5 × 10⁷ cells/g", benefits: ["Supports soil fertility", "Improves nutrient availability"] },
   "organic-phospho": { composition: "N 0.4–1.0% · P 8–20% · organic carbon 14%", benefits: ["Supports root growth", "Increases phosphorus availability"] },
   "potash-plus": { composition: "N 1.66% · P 0.38% · K 14.50%", benefits: ["Supports fruit and vegetable quality", "Supports plant resilience"] },

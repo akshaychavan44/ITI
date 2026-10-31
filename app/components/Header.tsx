@@ -218,7 +218,7 @@ export function Header({ interior = false }: { interior?: boolean }) {
               </div>
 
               <div>
-                <p className="mega-label">Bio Growth+ granular · 50 kg</p>
+                <p className="mega-label">Bio Growth+ product range</p>
                 <ul className="mega-links grid grid-cols-2 gap-x-6 gap-y-1">
                   {PRODUCTS.map((p) => (
                     <li key={p.id}>

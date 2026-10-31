@@ -61,7 +61,7 @@ export function Hero() {
               <div style={{ "--bob": "7s" } as React.CSSProperties}>
                 <Image
                   src="/brand/packs/growth-booster.png"
-                  alt="Bio Growth+ Growth Booster, 50 kg bag"
+                  alt="Bio Growth+ Growth Booster pack"
                   width={BAG.w}
                   height={BAG.h}
                   loading="eager"

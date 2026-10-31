@@ -1,5 +1,8 @@
 /** Plain-language explanations of the benefits listed in the product content. */
 export const BENEFIT_EXPLANATIONS: Record<string, string> = {
+  "Supports soil and plant health": "Organic carbon supports soil aeration, water retention and beneficial microbial activity around the roots.",
+  "Supports vegetative growth": "Protein and nitrogen support plant metabolism and the development of leaves, shoots and roots.",
+  "Supports stress tolerance and chlorophyll production": "Magnesium, iron and manganese support leaf greenness, chlorophyll synthesis and photosynthesis.",
   "Activates soil microorganisms": "Organic matter provides food for beneficial soil microorganisms. These organisms help break down organic material and recycle nutrients around the roots.",
   "Promotes growth of roots": "A well-developed root system helps plants explore more soil for water and nutrients. Supporting the root zone gives the plant a stronger foundation for growth.",
   "Increases organic matter, carbon and protein in the soil": "The organic cake adds carbon-rich material and protein to the soil. As it breaks down, it contributes organic matter and supports nutrient cycling.",
