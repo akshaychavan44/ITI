@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { BRAND, NAV } from "../lib/content";
 
-export function Footer() {
+export function Footer({ interior = false }: { interior?: boolean }) {
   return (
     <footer className="band-deep relative overflow-hidden pt-10">
       <div className="shell">
@@ -23,7 +23,7 @@ export function Footer() {
           <nav className="flex flex-col gap-2" aria-label="Footer">
             <span className="text-[13px] uppercase tracking-[0.1em] opacity-55 mb-1">Pages</span>
             {NAV.map((n) => (
-              <a key={n.href} href={n.href} className="text-[17px] opacity-85 hover:opacity-100 w-fit">
+              <a key={n.href} href={interior && n.href.startsWith("#") ? `/${n.href}` : n.href} className="text-[17px] opacity-85 hover:opacity-100 w-fit">
                 {n.label}
               </a>
             ))}
@@ -61,7 +61,7 @@ export function Footer() {
           <span>
             © {BRAND.founded}–2026 {BRAND.name}
           </span>
-          <span>Demo concept · colours from the pack artwork · field photography from Unsplash</span>
+          <span>Demo concept · colours from the pack artwork{interior ? "" : " · field photography from Unsplash"}</span>
         </div>
       </div>
     </footer>

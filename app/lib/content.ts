@@ -16,6 +16,7 @@ export const NAV = [
   { href: "#catalogue", label: "Catalogue" },
   { href: "#portfolio", label: "Portfolio" },
   { href: "#journey", label: "Journey" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export const HERO_STATS = [

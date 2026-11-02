@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BAG, BRAND, CATALOGUE, NAV, PRODUCTS, inkOf } from "../lib/content";
 import { productHref } from "../lib/catalogue";
@@ -17,7 +18,9 @@ const ALIASES: Record<string, string> = { "#spotlight": PRODUCTS_HREF };
  *  away as you scroll down and comes back once you scroll up by half
  *  its height. Products opens a panel that grows out of the bar. */
 export function Header({ interior = false }: { interior?: boolean }) {
+  const pathname = usePathname();
   const [active, setActive] = useState(interior ? PRODUCTS_HREF : "");
+  const current = pathname.startsWith("/blog") ? "/blog" : active;
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
@@ -54,7 +57,7 @@ export function Header({ interior = false }: { interior?: boolean }) {
 
   useEffect(() => {
     if (interior) return;
-    const sels = [...NAV.map((n) => n.href), ...Object.keys(ALIASES)];
+    const sels = [...NAV.map((n) => n.href).filter((href) => href.startsWith("#")), ...Object.keys(ALIASES)];
     const targets = sels
       .map((s) => document.querySelector(s))
       .filter((el): el is Element => !!el);
@@ -109,7 +112,7 @@ export function Header({ interior = false }: { interior?: boolean }) {
     setOpen(false);
     setSubOpen(false);
   };
-  const sectionHref = (href: string) => interior ? `/${href}` : href;
+  const sectionHref = (href: string) => interior && href.startsWith("#") ? `/${href}` : href;
 
   const tel = `tel:${BRAND.phone.replace(/\s/g, "")}`;
   const shown = PRODUCTS.find((p) => p.id === feature) ?? PRODUCTS[0];
@@ -146,7 +149,7 @@ export function Header({ interior = false }: { interior?: boolean }) {
                   ref={trigger}
                   type="button"
                   className="navlink"
-                  aria-current={active === n.href ? "true" : undefined}
+                  aria-current={current === n.href ? "true" : undefined}
                   aria-expanded={mega}
                   aria-controls="mega"
                   onMouseEnter={() => setMega(true)}
@@ -161,7 +164,7 @@ export function Header({ interior = false }: { interior?: boolean }) {
                   key={n.href}
                   href={sectionHref(n.href)}
                   className="navlink"
-                  aria-current={active === n.href ? "true" : undefined}
+                  aria-current={current === n.href ? "true" : undefined}
                   onMouseEnter={() => setMega(false)}
                   onClick={closeAll}
                 >
@@ -179,7 +182,7 @@ export function Header({ interior = false }: { interior?: boolean }) {
               </span>
               {BRAND.phone}
             </a>
-            <a href="#contact" className="nav-cta hidden sm:inline-flex" onClick={closeAll}>
+            <a href={pathname.startsWith("/blog") ? "/#contact" : "#contact"} className="nav-cta hidden sm:inline-flex" onClick={closeAll}>
               Enquire
               <span>
                 <ArrowUpRight size={17} />
@@ -324,9 +327,9 @@ export function Header({ interior = false }: { interior?: boolean }) {
                   )}
                 </div>
               ) : (
-                <a key={n.href} href={sectionHref(n.href)} onClick={closeAll} className="mobile-row border-b border-white/10">
+                <a key={n.href} href={sectionHref(n.href)} onClick={closeAll} aria-current={current === n.href ? "true" : undefined} className="mobile-row border-b border-white/10">
                   <span className="display text-[32px]">{n.label}</span>
-                  {active === n.href && <span className="w-2.5 h-2.5 rounded-full bg-[var(--green-light)]" />}
+                  {current === n.href && <span className="w-2.5 h-2.5 rounded-full bg-[var(--green-light)]" />}
                 </a>
               ),
             )}
@@ -335,7 +338,7 @@ export function Header({ interior = false }: { interior?: boolean }) {
                 <Phone /> Call
               </a>
               <a
-                href="#contact"
+                href={pathname.startsWith("/blog") ? "/#contact" : "#contact"}
                 onClick={closeAll}
                 className="flex items-center justify-center gap-2 h-14 rounded-lg bg-field text-white font-semibold"
               >
