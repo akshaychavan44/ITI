@@ -1,7 +1,8 @@
 import Image from "next/image";
-import { BRAND, JOURNEY_COPY, JOURNEY_MARKS } from "../lib/content";
+import { BRAND, JOURNEY_COPY } from "../lib/content";
 import { Wave } from "./Wave";
 import { Words } from "./Words";
+import { JourneyTimeline } from "./JourneyTimeline";
 
 export function Journey() {
   return (
@@ -61,26 +62,7 @@ export function Journey() {
             ))}
           </div>
 
-          <ol className="mt-14 animated-block rise">
-            {JOURNEY_MARKS.map((m, i) => (
-              <li
-                key={m.year}
-                className="grid sm:grid-cols-[190px_1fr] items-baseline gap-x-8 gap-y-1 py-6 border-t"
-                style={{
-                  borderColor: "rgba(255,255,255,0.16)",
-                  animationDelay: `${(0.15 + i * 0.06).toFixed(3)}s`,
-                }}
-              >
-                <span
-                  className="display leading-none"
-                  style={{ color: "var(--hi)", fontSize: "clamp(3rem, 4.6vw, 4.4rem)" }}
-                >
-                  {m.year}
-                </span>
-                <span className="text-[18px] opacity-85">{m.label}</span>
-              </li>
-            ))}
-          </ol>
+          <JourneyTimeline />
         </div>
       </div>
 

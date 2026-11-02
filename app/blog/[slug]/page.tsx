@@ -4,7 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight } from "../../components/Icons";
 import { BlogPhotoComposition } from "../../components/BlogPhotoComposition";
-import { BlogImageTrail, type BlogTrailStyle } from "../../components/BlogImageTrail";
 import { BlogSectionReveal } from "../../components/BlogSectionReveal";
 import { BLOG_POSTS, readingTime } from "../../lib/blog";
 
@@ -22,13 +21,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!post) notFound();
   const related = BLOG_POSTS.filter((item) => item.slug !== slug).slice(0, 2);
   const photos = post.photos;
-  const trailStyles: BlogTrailStyle[] = ["curve", "rounded", "wave", "sweep"];
-  const trailStyle = trailStyles[BLOG_POSTS.findIndex((item) => item.slug === slug)] ?? "curve";
 
   return <main id="main-content" className="blog-article shell">
     <nav className="catalogue-breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span aria-hidden>/</span><Link href="/blog">Blog</Link><span aria-hidden>/</span><span aria-current="page">{post.title}</span></nav>
     <article className="blog-story-journey">
-      <BlogImageTrail key={post.slug} variant={trailStyle} />
       <BlogSectionReveal key={`reveal-${post.slug}`} />
       <header className="blog-visual-opening" data-photo-side="right">
         <div className="blog-article-title">

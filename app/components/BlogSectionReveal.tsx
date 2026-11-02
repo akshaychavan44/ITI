@@ -11,21 +11,21 @@ export function BlogSectionReveal() {
     if (!article) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sections = Array.from(article.querySelectorAll<HTMLElement>("[data-photo-side]"));
-    const pending = new Map<HTMLElement, Animation[]>();
-    const sequences = new Map<HTMLElement, Animation[]>();
+    const pending = new Map<Element, Animation>();
+    const sequences = new Map<Element, Animation>();
     const animations: Animation[] = [];
-    const reveal = (section: HTMLElement) => {
-      const sequence = pending.get(section);
-      if (!sequence) return;
-      sequence.forEach((animation) => animation.play());
-      pending.delete(section);
-      observer.unobserve(section);
+    const reveal = (element: Element) => {
+      const animation = pending.get(element);
+      if (!animation) return;
+      animation.play();
+      pending.delete(element);
+      observer.unobserve(element);
     };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) reveal(entry.target as HTMLElement);
+        if (entry.isIntersecting && entry.intersectionRatio >= .2) reveal(entry.target);
       });
-    }, { threshold: 0, rootMargin: "0px 0px -14% 0px" });
+    }, { threshold: .2, rootMargin: "-90px 0px -10% 0px" });
 
     const finishAll = () => {
       animations.forEach((animation) => animation.finish());
@@ -36,29 +36,28 @@ export function BlogSectionReveal() {
     if (!motion.matches) {
       for (const section of sections) {
         const right = section.dataset.photoSide === "right";
-        const sequence: Animation[] = [];
         const add = (element: Element, from: string, delay: number) => {
           const animation = element.animate([
             { opacity: 0, transform: from },
             { opacity: 1, transform: "translate3d(0, 0, 0)" },
-          ], { duration: 780, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "both" });
+          ], { duration: 1250, delay, easing: "cubic-bezier(.22, .75, .25, 1)", fill: "both" });
           animation.pause();
-          sequence.push(animation);
+          // Observe the actual image, heading or text, not its taller parent section.
+          pending.set(element, animation);
+          sequences.set(element, animation);
           animations.push(animation);
+          observer.observe(element);
         };
-        // Animate slots, not the measured photo-group wrapper used by the green trail.
+        // Keep the photo layout stable while each image eases into place.
         section.querySelectorAll(".blog-photo-slot").forEach((slot, index) => {
-          add(slot, `translate3d(${right ? 42 : -42}px, 0, 0)`, index * 70);
+          add(slot, `translate3d(${right ? 42 : -42}px, 0, 0)`, index * 80);
         });
         section.querySelectorAll(".blog-visual-copy > .blog-eyebrow, .blog-article-title > .blog-eyebrow, h1, h2").forEach((heading, index) => {
-          add(heading, "translate3d(0, -22px, 0)", 130 + index * 60);
+          add(heading, "translate3d(0, -22px, 0)", 120 + index * 80);
         });
         section.querySelectorAll(".blog-visual-points li, .blog-article-intro, .blog-article-title > .blog-story-link, .blog-visual-takeaway").forEach((text, index) => {
-          add(text, `translate3d(${right ? -30 : 30}px, 0, 0)`, 290 + index * 90);
+          add(text, `translate3d(${right ? -30 : 30}px, 0, 0)`, 240 + index * 100);
         });
-        pending.set(section, sequence);
-        sequences.set(section, sequence);
-        observer.observe(section);
       }
     }
 
@@ -67,10 +66,12 @@ export function BlogSectionReveal() {
       const section = event.target.closest<HTMLElement>("[data-photo-side]");
       if (!section) return;
       // Keyboard navigation always exposes a focused link immediately.
-      const sequence = sequences.get(section);
-      if (sequence) sequence.forEach((animation) => animation.finish());
-      pending.delete(section);
-      observer.unobserve(section);
+      sequences.forEach((animation, element) => {
+        if (!section.contains(element)) return;
+        animation.finish();
+        pending.delete(element);
+        observer.unobserve(element);
+      });
     };
     const onMotion = () => { if (motion.matches) finishAll(); };
     article.addEventListener("focusin", onFocus);

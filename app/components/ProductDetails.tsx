@@ -3,7 +3,7 @@
 import { useState, type CSSProperties } from "react";
 import Image from "next/image";
 import type { CatalogueProduct } from "../lib/catalogue";
-import { BAG, BRAND } from "../lib/content";
+import { BAG } from "../lib/content";
 import { productDetailCopy } from "../lib/product-detail-copy";
 import { PRODUCT_COMPOSITION, COMPOSITION_HINDI } from "../lib/product-composition";
 import { GROWTH_COMPOSITION } from "../lib/growth-booster";
@@ -65,11 +65,10 @@ export function ProductDetails({ product: p }: { product: CatalogueProduct }) {
           <p className="catalogue-eyebrow">{language === "hi" ? "लाभ और उपयोग" : "Benefits & application"}</p>
           <h2 className="display">{copy.legalEyebrow}</h2>
           <GrowthInformationAccordion key={language} items={[
-            { title: copy.benefitsTitle, content: <dl>{copy.benefits.map(([title, text]) => <div key={title}><dt>{title}</dt><dd>{text}</dd></div>)}</dl> },
+            { title: copy.benefitsTitle, content: <ul className="growth-benefit-summary">{copy.benefits.map(([title]) => <li key={title}>{title}</li>)}</ul> },
             ...copy.steps.map((step) => ({ title: step.title, content: <dl>{step.items.map(([title, text]) => <div key={title}><dt>{title}</dt><dd>{text}</dd></div>)}</dl> })),
             { title: copy.legalTitle, content: <dl>
               <div><dt>{copy.manufacturer}</dt><dd>{copy.address}</dd></div>
-              <div><dt>{copy.contact}</dt><dd className="growth-contact-links"><a href={`mailto:${BRAND.email}`}>{BRAND.email}</a><a href="tel:+919981820966">+91 99818 20966</a><a href="https://www.itibiotech.in">www.itibiotech.in</a></dd></div>
               <div><dt>{copy.packageTitle}</dt><dd>{copy.packageNote}</dd></div>
             </dl> },
           ]} />
