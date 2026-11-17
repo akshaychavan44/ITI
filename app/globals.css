@@ -748,6 +748,13 @@ html.lenis body {
        empty player */
     opacity: 0;
     transition: opacity 0.6s ease;
+    /* the camera move: push in, drift right (away from the captions) and
+       tilt slightly, as if arcing round the plant. The zoom always
+       outpaces the drift and tilt, so no edge of the frame shows. */
+    transform-origin: 56% 58%;
+    transform: translateX(calc(var(--cam, 0) * 3%)) rotate(calc(var(--cam, 0) * -1.6deg))
+      scale(calc(1 + var(--cam, 0) * 0.15));
+    will-change: transform;
   }
   .grow-stage[data-ready] .grow-film {
     opacity: 1;

@@ -42,6 +42,9 @@ const STEP_STARTS = [0, 0.11, 0.29, 0.6];
 /* Hold the first and last frames for a moment at either end of the run. */
 const FILM_IN = 0.03;
 const FILM_OUT = 0.94;
+/* Share of the film where the camera starts to move: the plant is about
+   half grown by ~6.2s. */
+const CAMERA_FROM = 0.42;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const seg = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
@@ -102,6 +105,14 @@ export function Grow() {
     };
     vid.addEventListener("loadeddata", prime);
 
+    /* Once the plant is about half grown, the "camera" eases in, drifts
+       and tilts a little. Driven by the eased film position, so the move
+       stays locked to the footage. */
+    const moveCamera = (f: number) => {
+      const c = seg(f, CAMERA_FROM, 1);
+      el.style.setProperty("--cam", (c * c * (3 - 2 * c)).toFixed(4));
+    };
+
     let target = 0; // film position the scroll asks for, 0–1
     let shown = 0; // eased position actually on screen
     let frame = 0;
@@ -122,6 +133,7 @@ export function Grow() {
       frame = 0;
       shown += (target - shown) * 0.2;
       if (Math.abs(target - shown) < 0.0005) shown = target;
+      moveCamera(shown);
       const d = vid.duration;
       if (d && !vid.seeking) {
         const t = shown * (d - 0.05);
@@ -153,6 +165,7 @@ export function Grow() {
 
     measure();
     shown = target;
+    moveCamera(shown);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
