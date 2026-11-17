@@ -1,4 +1,4 @@
-import { MARQUEE } from "../lib/content";
+ import { MARQUEE } from "../lib/content";
 import { Wave } from "./Wave";
 
 function PlusMark() {

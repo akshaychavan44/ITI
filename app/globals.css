@@ -712,15 +712,17 @@ html.lenis body {
     transform: rotate(0deg) scale(1.06) !important;
   }
 
-  /* ─── How it works (pinned scene) ───────────────────── */
+  /* ─── How it works (pinned film) ────────────────────── */
   /* The section is tall; the stage inside it sticks for the whole run
-     and the scroll position scrubs the drawing. */
+     and the scroll position scrubs the film. Captions sit in a quiet
+     column on the left, over a shade that keeps them readable whatever
+     frame is behind them. */
 
   .grow {
     position: relative;
     height: 440vh;
     padding-bottom: clamp(56px, 8vw, 132px);
-    background: var(--soil-deep);
+    background: #0a1a0f;
     color: #fff;
   }
   .grow-stage {
@@ -728,50 +730,100 @@ html.lenis body {
     top: 0;
     height: 100svh;
     overflow: hidden;
-    background: var(--deep);
+    background: #0a1a0f;
+  }
+  .grow-film,
+  .grow-still {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .grow-still {
+    display: none;
+  }
+  .grow-film {
+    /* fade in once the first frame is decoded, so there is no flash of an
+       empty player */
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .grow-stage[data-ready] .grow-film {
+    opacity: 1;
+  }
+  /* Sunlight: a warm glow and soft rays from the top right, where the
+     film's own light comes from. Dim while the granule is underground,
+     full once the crop is up (--p is scroll progress). */
+  .grow-sun {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: calc(0.35 + var(--p, 0) * 0.65);
+    background:
+      radial-gradient(circle at 84% -4%, rgba(255, 238, 200, 0.85) 0%, rgba(255, 214, 140, 0.45) 9%, rgba(255, 196, 120, 0) 30%),
+      radial-gradient(ellipse 65% 70% at 82% -8%, rgba(255, 210, 140, 0.55) 0%, rgba(255, 190, 110, 0.2) 40%, rgba(255, 190, 110, 0) 72%),
+      linear-gradient(205deg, rgba(255, 200, 120, 0.18) 0%, rgba(255, 200, 120, 0) 60%);
+  }
+  .grow-sun::before {
+    content: "";
+    position: absolute;
+    inset: -25%;
+    background: repeating-conic-gradient(from 190deg at 80% 18%, rgba(255, 230, 180, 0.38) 0deg 3deg, rgba(255, 230, 180, 0) 3deg 9deg);
+    filter: blur(16px);
+    -webkit-mask-image: radial-gradient(ellipse 60% 65% at 80% 18%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(ellipse 60% 65% at 80% 18%, #000 0%, transparent 72%);
+    transform-origin: 80% 18%;
+    animation: grow-rays 16s ease-in-out infinite alternate;
+  }
+  @keyframes grow-rays {
+    from {
+      transform: rotate(-2.5deg);
+      opacity: 0.65;
+    }
+    to {
+      transform: rotate(2.5deg);
+      opacity: 1;
+    }
+  }
+  .grow-shade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(8, 20, 11, 0.86) 0%, rgba(8, 20, 11, 0.55) 30%, rgba(8, 20, 11, 0) 58%),
+      linear-gradient(180deg, rgba(8, 20, 11, 0.55) 0%, rgba(8, 20, 11, 0) 22%, rgba(8, 20, 11, 0) 78%, rgba(8, 20, 11, 0.6) 100%);
   }
   .grow-copy {
     position: relative;
     z-index: 2;
     height: 100%;
     display: flex;
-    align-items: flex-start;
-    padding-top: calc(var(--gap) + 18px);
+    align-items: center;
     pointer-events: none;
   }
   .grow-panel {
     width: 100%;
     max-width: 520px;
   }
-  @media (min-width: 1024px) {
-    .grow-copy {
-      align-items: center;
-      padding-top: 0;
-    }
-  }
   .grow-eyebrow {
     display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 14px;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 32px;
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--hi);
   }
-  .grow-count::before {
-    content: "01";
-  }
-  [data-step="1"] .grow-count::before {
-    content: "02";
-  }
-  [data-step="2"] .grow-count::before {
-    content: "03";
-  }
-  [data-step="3"] .grow-count::before,
-  [data-step="all"] .grow-count::before {
-    content: "04";
+  .grow-eyebrow-rule {
+    width: 32px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.7;
   }
   /* all four captions share one cell and cross-fade */
   .grow-steps {
@@ -780,8 +832,12 @@ html.lenis body {
   .grow-step {
     grid-area: 1 / 1;
     opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translateY(14px);
+    filter: blur(4px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.6s ease;
   }
   [data-step="0"] .grow-step[data-i="0"],
   [data-step="1"] .grow-step[data-i="1"],
@@ -789,46 +845,90 @@ html.lenis body {
   [data-step="3"] .grow-step[data-i="3"] {
     opacity: 1;
     transform: none;
+    filter: none;
   }
-  .grow-title {
-    font-size: clamp(2.6rem, 5.4vw, 5.6rem);
+  .grow-num {
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
     color: #fff;
   }
-  .grow-bar {
-    margin-top: 28px;
-    height: 3px;
-    border-radius: 3px;
+  .grow-num > span {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  /* Anton via .display, as every other section headline */
+  .grow-title {
+    font-size: clamp(2.9rem, 5.6vw, 5.8rem);
+    color: #fff;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.35);
+  }
+  .grow-body {
+    margin-top: 18px;
+    max-width: 36ch;
+    font-size: clamp(17px, 1.3vw, 19px);
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.82);
+  }
+  /* one hairline per caption, each filling while its part of the film plays */
+  .grow-rail {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 44px;
+  }
+  .grow-rail-seg {
+    height: 2px;
     background: rgba(255, 255, 255, 0.16);
     overflow: hidden;
   }
-  .grow-bar > span {
+  .grow-rail-seg > span {
     display: block;
     height: 100%;
-    background: var(--green-light);
+    background: var(--hi);
     transform-origin: left;
-    transform: scaleX(var(--p));
   }
-  /* small screens: the copy sits over the sky, so keep it short */
+  /* the brand signs off once the crop has grown */
+  .grow-mark {
+    position: absolute;
+    z-index: 2;
+    right: clamp(20px, 4vw, 56px);
+    bottom: clamp(24px, 5vh, 48px);
+    width: clamp(64px, 6vw, 92px);
+    height: auto;
+    opacity: var(--end, 0);
+    transform: translateY(calc((1 - var(--end, 0)) * 10px));
+    pointer-events: none;
+  }
+  /* small and tall screens: the copy moves to the top, over the dark sky
+     of the film, with the shade turned to match */
   @media (max-width: 1023px) {
-    .grow-title {
-      font-size: clamp(2.2rem, 9vw, 3.4rem);
+    .grow-copy {
+      align-items: flex-start;
+      padding-top: calc(var(--header-h) + 28px);
     }
-    .grow-step p + p {
-      margin-top: 8px;
+    .grow-shade {
+      background: linear-gradient(180deg, rgba(8, 20, 11, 0.88) 0%, rgba(8, 20, 11, 0.6) 34%, rgba(8, 20, 11, 0) 58%, rgba(8, 20, 11, 0) 80%, rgba(8, 20, 11, 0.55) 100%);
+    }
+    .grow-eyebrow {
+      margin-bottom: 24px;
+    }
+    .grow-num {
+      margin-bottom: 10px;
+    }
+    .grow-title {
+      font-size: clamp(2.3rem, 10vw, 3.5rem);
+    }
+    .grow-sun {
+      opacity: calc(0.2 + var(--p, 0) * 0.5);
+    }
+    .grow-body {
+      margin-top: 12px;
       font-size: 15.5px;
     }
-    .grow-bar {
-      margin-top: 16px;
+    .grow-rail {
+      margin-top: 24px;
     }
-  }
-  .grow-swell {
-    animation: swell 5s linear infinite;
-  }
-  .grow-caustics {
-    animation: swell 9s linear infinite reverse;
-  }
-  .grow-sway {
-    animation: sway 4.5s ease-in-out infinite alternate;
   }
 
   /* ─── Marquee ────────────────────────────────────────── */
@@ -982,21 +1082,6 @@ html.lenis body {
   100% {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-@keyframes swell {
-  to {
-    transform: translateX(-200px);
-  }
-}
-
-@keyframes sway {
-  from {
-    transform: rotate(-3deg);
-  }
-  to {
-    transform: rotate(3deg);
   }
 }
 
@@ -1385,27 +1470,38 @@ html.lenis body {
   }
   .marquee,
   .bit > *,
-  .grow-swell,
-  .grow-caustics,
-  .grow-sway {
+  .grow-sun::before {
     animation: none !important;
   }
-  /* no scrubbing: one screen, the finished plant, every caption */
+  /* no scrubbing: one screen, the grown crop, every caption */
   .grow {
     height: auto;
   }
   .grow-stage {
     position: relative;
+    height: auto;
     min-height: 100svh;
+  }
+  .grow-film,
+  .grow-num,
+  .grow-rail {
+    display: none;
+  }
+  .grow-still {
+    display: block;
+  }
+  .grow-copy {
+    padding-block: calc(var(--header-h) + 40px) 64px;
   }
   .grow-step {
     grid-area: auto;
     opacity: 1;
     transform: none;
-    margin-bottom: 20px;
+    filter: none;
+    margin-bottom: 28px;
   }
-  .grow-bar {
-    display: none;
+  .grow-title {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
   }
   *,
   *::before,
